@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "10581785745",
+    "firebase_url": "https://todolist-32cb6.firebaseio.com",
+    "project_id": "todolist-32cb6",
+    "storage_bucket": "todolist-32cb6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:10581785745:android:b7a9b566f75b2f2b",
+        "android_client_info": {
+          "package_name": "com.knoxpo.rajivsonawala.easytow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "10581785745-rv0p2c6fn3v20vumeljk8bpnc31mneop.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQXjW_i4V21l0SP183ttVQbiNf81nexoc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

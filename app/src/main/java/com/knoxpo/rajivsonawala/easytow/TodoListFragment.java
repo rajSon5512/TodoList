@@ -17,20 +17,50 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TodoListFragment extends Fragment {
 
+    private static final String TAG ="Firebase" ;
     private RecyclerView mRecyclerView;
     private Adapter mAdapter;
 
+   private final FirebaseFirestore db=FirebaseFirestore.getInstance();
+   private final CollectionReference todoList=db.collection("TodoList");
+//   private final DocumentReference docRef = db.collection("TodoList").document("");
+
     private ArrayList<Todo> mTodos = new ArrayList<>();
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+
+     /*       db.collection("TodoList")
+                .add(todoMapList)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
+        */
+
     }
 
     @Nullable
@@ -84,8 +114,11 @@ public class TodoListFragment extends Fragment {
 
             case R.id.add_button:
                 Todo todo = new Todo();
+                Map<String,UUID> todoMapList=new HashMap<String,UUID>();
                 mTodos.add(todo);
+                todoMapList.put(todo.getString(),todo.getId());
                 mAdapter.notifyItemInserted(mTodos.size()-1);
+                todoList.add(todoMapList);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -120,7 +153,9 @@ public class TodoListFragment extends Fragment {
         public void onClick(View v) {
 
             mTodos.remove(mpoition);
-            updateUI();
+            mAdapter.notifyItemRemoved(mpoition);
+            todoList.document("8OctOTigyR2ncuhMDCzj").delete();
+
             Toast.makeText(getActivity(),"Click ="+mpoition,Toast.LENGTH_SHORT).show();
         }
     }
