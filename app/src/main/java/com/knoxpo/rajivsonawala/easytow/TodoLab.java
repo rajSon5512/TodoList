@@ -28,11 +28,9 @@ public class TodoLab {
     public void addTodoItem(Todo c){
 
         mList.add(c);
-
-
     }
 
-    public List<Todo> getTodoItem(){
+    public List<Todo> getTodo(){
         
         return mList;
 
@@ -50,6 +48,14 @@ public class TodoLab {
         }
 
     return null;
+    }
+
+    public void remove(Todo tempTodo){
+
+        int remove=mList.indexOf(tempTodo);
+
+        mList.remove(remove);
+
     }
 
 }

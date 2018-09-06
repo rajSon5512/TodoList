@@ -5,8 +5,8 @@
 
     <item
         android:id="@+id/add_button"
-        app:showAsAction="ifRoom|collapseActionView"
         android:icon="@android:drawable/ic_menu_add"
-        tools:ignore="MenuTitle"></item>
+        android:title="Add Item"
+        app:showAsAction="ifRoom"/>
 
 </menu>

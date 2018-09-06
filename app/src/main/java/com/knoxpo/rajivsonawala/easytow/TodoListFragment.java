@@ -1,7 +1,6 @@
 package com.knoxpo.rajivsonawala.easytow;
 
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,107 +13,140 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
-@SuppressLint("ValidFragment")
-class TodoListFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TodoListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private Adapter mAdapter;
-    private TodoLab tabLab;
+
+    private ArrayList<Todo> mTodos = new ArrayList<>();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view=inflater.inflate(R.layout.activity_main,container,false);
+        View view = inflater.inflate(R.layout.fragment_todo_list, container, false);
 
-        mRecyclerView=view.findViewById(R.id.fragment_recycler_view);
+        mRecyclerView = view.findViewById(R.id.fragment_recycler_view);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        updateUI();
 
         return view;
     }
 
+    private void updateUI() {
+
+        TodoLab todoList = TodoLab.get(getActivity());
+        List<Todo> mtodoList = todoList.getTodo();
+        if (mAdapter == null) {
+
+            mAdapter = new Adapter();
+            mRecyclerView.setAdapter(mAdapter);
+
+        } else {
+
+            mAdapter.notifyDataSetChanged();
+        }
+
+
+    }
+
+    @Override
+    public void onResume() {
+        updateUI();
+        super.onResume();
+    }
+
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        inflater.inflate(R.menu.action_menubar,menu);
-        MenuItem menuItem=menu.findItem(R.id.add_button);
-
+        inflater.inflate(R.menu.action_menubar, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
 
-            case R.id.add_button:Todo todo=new Todo();
-                                  tabLab.addTodoItem(todo);
-                                    return true;
+            case R.id.add_button:
+                Todo todo = new Todo();
+                mTodos.add(todo);
+                mAdapter.notifyItemInserted(mTodos.size()-1);
+                return true;
             default:
-                   return super.onOptionsItemSelected(item);
+                return super.onOptionsItemSelected(item);
 
         }
 
 
     }
 
-    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        Todo todoList;
-        TextView mTextView;
-        ImageView mImageView;
+        private TextView mTextView;
+        private ImageButton mImageView;
+        private int mpoition;
 
-        public Holder(LayoutInflater inflater,ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_view,parent,false));
+        public Holder(View itemView) {
+            super(itemView);
+
+            mTextView = itemView.findViewById(R.id.text_myString);
+            mImageView = itemView.findViewById(R.id.delete_button);
+
             mImageView.setOnClickListener(this);
-
-            mTextView=(TextView)itemView.findViewById(R.id.text_myString);
-            mImageView=(ImageView)itemView.findViewById(R.id.delete_button);
-
         }
 
-        public void bind(){
-
-
-
+        public void bind(Todo todo,int position) {
+            mTextView.setText(todo.getString());
+            mpoition=position;
         }
 
 
         @Override
         public void onClick(View v) {
 
+            mTodos.remove(mpoition);
+            updateUI();
+            Toast.makeText(getActivity(),"Click ="+mpoition,Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
-    public class Adapter extends RecyclerView.Adapter<Holder>{
+    public class Adapter extends RecyclerView.Adapter<Holder> {
+       private LayoutInflater mInflater;
 
+        public Adapter() {
+            mInflater = LayoutInflater.from(getActivity());
+        }
 
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+            View itemView = mInflater.inflate(R.layout.list_item_view, parent, false);
+            return new Holder(itemView);
         }
 
         @Override
         public void onBindViewHolder(Holder holder, int position) {
-
+            Todo todo = mTodos.get(position);
+            holder.bind(todo,position);
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return mTodos.size();
         }
     }
-
 }
-
