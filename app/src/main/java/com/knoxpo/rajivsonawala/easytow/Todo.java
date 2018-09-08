@@ -5,7 +5,10 @@ import java.util.UUID;
 public class Todo {
 
     private String mString;
+
+
     private UUID Id;
+
 
     public Todo(){
 
@@ -20,6 +23,14 @@ public class Todo {
 
     public UUID getId() {
         return Id;
+    }
+
+    public void setString(String string) {
+        mString = string;
+    }
+
+    public void setId(UUID id) {
+        Id = id;
     }
 
 

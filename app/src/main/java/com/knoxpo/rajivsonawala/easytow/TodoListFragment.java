@@ -17,8 +17,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,22 +48,26 @@ public class TodoListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        todoList.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-     /*       db.collection("TodoList")
-                .add(todoMapList)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
-        */
+                List<DocumentSnapshot> documents=task.getResult().getDocuments();
+
+                for(int i=0;i<documents.size();i++){
+
+                    Todo mTodo=new Todo();
+
+                    mTodo.setString(documents.get(i).getString("text"));
+                    mTodo.setId(UUID.fromString(documents.get(i).getId()));
+                    mTodos.add(mTodo);
+
+                }
+
+            }
+        });
+
+
 
     }
 
@@ -118,7 +126,8 @@ public class TodoListFragment extends Fragment {
                 mTodos.add(todo);
                 todoMapList.put(todo.getString(),todo.getId());
                 mAdapter.notifyItemInserted(mTodos.size()-1);
-                todoList.add(todoMapList);
+                todoList.document(String.valueOf(todo.getId())).set(todoMapList);
+                //todoList.add(todoMapList);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -132,7 +141,7 @@ public class TodoListFragment extends Fragment {
 
         private TextView mTextView;
         private ImageButton mImageView;
-        private int mpoition;
+        private Todo mBoundTodo;
 
         public Holder(View itemView) {
             super(itemView);
@@ -143,22 +152,36 @@ public class TodoListFragment extends Fragment {
             mImageView.setOnClickListener(this);
         }
 
-        public void bind(Todo todo,int position) {
+        public void bind(Todo todo) {
+            mBoundTodo = todo;
             mTextView.setText(todo.getString());
-            mpoition=position;
         }
 
 
         @Override
         public void onClick(View v) {
 
-            mTodos.remove(mpoition);
-            mAdapter.notifyItemRemoved(mpoition);
-            todoList.document("8OctOTigyR2ncuhMDCzj").delete();
+            if(mTodos.isEmpty()){
 
-            Toast.makeText(getActivity(),"Click ="+mpoition,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),"Empty",Toast.LENGTH_SHORT).show();
+
+            }else {
+
+                int position = mTodos.indexOf(mBoundTodo);
+                if(position >= 0){
+
+                    todoList.document(String.valueOf(mTodos.get(position).getId())).delete();
+                    mTodos.remove(position);
+                    mAdapter.notifyItemRemoved(position);
+                }
+
+                //Toast.makeText(getActivity(), "Click =" + mpoition, Toast.LENGTH_SHORT).show();
+
+            }
+
         }
     }
+
 
     public class Adapter extends RecyclerView.Adapter<Holder> {
        private LayoutInflater mInflater;
@@ -176,7 +199,7 @@ public class TodoListFragment extends Fragment {
         @Override
         public void onBindViewHolder(Holder holder, int position) {
             Todo todo = mTodos.get(position);
-            holder.bind(todo,position);
+            holder.bind(todo);
         }
 
         @Override
