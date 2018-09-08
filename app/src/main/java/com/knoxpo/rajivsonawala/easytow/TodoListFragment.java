@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,19 +52,18 @@ public class TodoListFragment extends Fragment {
         todoList.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
                 List<DocumentSnapshot> documents=task.getResult().getDocuments();
-
                 for(int i=0;i<documents.size();i++){
-
                     Todo mTodo=new Todo();
 
-                    mTodo.setString(documents.get(i).getString("text"));
                     mTodo.setId(UUID.fromString(documents.get(i).getId()));
+                  //  String text=documents.get(i).getString("text");
+                    mTodo.setString(documents.get(i).getString("data"));
                     mTodos.add(mTodo);
-
+                    Log.d(TAG, "onComplete: "+mTodo.getId());
+                    Log.d(TAG, "onComplete: "+mTodo.getString());
                 }
-
+                mAdapter.notifyDataSetChanged();
             }
         });
 
@@ -122,12 +122,11 @@ public class TodoListFragment extends Fragment {
 
             case R.id.add_button:
                 Todo todo = new Todo();
-                Map<String,UUID> todoMapList=new HashMap<String,UUID>();
+                Map<String,Object> todoData=new HashMap<String,Object>();
+                todoData.put("data", todo.getString());
                 mTodos.add(todo);
-                todoMapList.put(todo.getString(),todo.getId());
                 mAdapter.notifyItemInserted(mTodos.size()-1);
-                todoList.document(String.valueOf(todo.getId())).set(todoMapList);
-                //todoList.add(todoMapList);
+                todoList.document(String.valueOf(todo.getId())).set(todoData);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
